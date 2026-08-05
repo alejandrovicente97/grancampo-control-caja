@@ -8,6 +8,22 @@ se carga por CDN.
 
 ---
 
+## Las tres divisiones
+
+El grupo se organiza en tres marcas, y el dashboard las respeta: el selector de ámbito
+permite ver el grupo consolidado, una división completa o una sociedad suelta, y el color
+de acento de toda la interfaz cambia según la división activa.
+
+| División | Marca | Sociedades | Web |
+|---|---|---|---|
+| **Grancampo** | verde oliva | Grancampo Desarrollos, Dehesa El Corcho XXI, Dehesa Castrillo XXI, Dehesa Checa, La Cañada de Hernandinos, Explotaciones Solalba | https://grancampo.es/ |
+| **Ibéricos Alhándiga** | granate | Alhándiga Ibéricos, Universo Alhándiga, Grancampo Market Restauración | https://ibericosalhandiga.com/ |
+| **Promociones Montellano** | azul marino | Promociones Urbanas Montellano | https://promocionesmontellano.com/ |
+
+Los logotipos van embebidos en el propio HTML, así que el fichero sigue siendo autocontenido.
+Los gráficos multiserie mantienen una paleta validada para daltonismo y contraste; los de una
+sola serie usan el color de la división activa.
+
 ## Qué contiene
 
 | Pestaña | Ámbito |
@@ -52,7 +68,7 @@ separado de la lógica. **La lógica no se toca nunca para ampliar.**
 
 Las diez sociedades del perímetro ya están dadas de alta. Para volcarle datos a una:
 
-1. Sus cuentas en `DATA.cuentas` (usando el nombre **normalizado** del banco).
+1. Alta en `DATA.sociedades` con su `div` (`GC`, `AL` o `MO`) y sus cuentas en `DATA.cuentas`, usando el nombre **normalizado** del banco.
 2. Sus saldos en `DATA.saldosMes` y su deuda en `DATA.deuda`.
 3. Si tiene libro diario, además: `DATA.aperturas`, `DATA.movs`, `DATA.traspasos`,
    `DATA.saldosDia` y, opcionalmente, `DATA.estructura`, `DATA.naturProv`,
