@@ -4,7 +4,7 @@ Dashboard de tesorería del grupo. Un único fichero HTML autocontenido, sin bui
 dependencias que instalar: todo el CSS y el JS van en línea y la librería de gráficos
 se carga por CDN.
 
-**Publicado en:** `https://<usuario>.github.io/<repo>/`
+**Publicado en:** https://alejandrovicente97.github.io/grancampo-control-caja/
 
 ---
 
