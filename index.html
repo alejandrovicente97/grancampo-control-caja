@@ -4,24 +4,27 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Control de Caja · Grupo Alhándiga Grancampo</title>
+<link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><rect width="16" height="16" rx="3.5" fill="%23f4f5f1"/><rect x="2.2" y="2.5" width="3.4" height="11" rx="1" fill="%234b7f36"/><rect x="6.3" y="2.5" width="3.4" height="11" rx="1" fill="%238e1b29"/><rect x="10.4" y="2.5" width="3.4" height="11" rx="1" fill="%23102c57"/></svg>'>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
 :root{
   color-scheme:light;
-  --plane:#f9f9f7; --surface:#ffffff; --surface-2:#f4f4f1;
+  --plane:#f4f5f1; --surface:#ffffff; --surface-2:#eef0ea;
+  --shadow:0 1px 2px rgba(20,24,15,.05),0 2px 8px rgba(20,24,15,.05);
   --ink:#0b0b0b; --ink-2:#52514e; --muted:#898781;
   --grid:#e1e0d9; --axis:#c3c2b7; --border:rgba(11,11,11,.10);
   --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --s4:#eda100; --s5:#e87ba4; --s6:#008300; --s7:#4a3aa7; --s8:#e34948;
   --good:#0ca30c; --warn:#fab219; --serious:#ec835a; --crit:#d03b3b;
   --pos:#006300; --neg:#b3261e;
-  --radius:10px;
+  --radius:12px;
   /* ── marca · lo sobreescribe el ámbito activo ── */
   --brand:#3d5a3a; --brand-2:#8e1b29; --brand-ink:#ffffff;
   --brand-soft:rgba(61,90,58,.10); --brand-line:rgba(61,90,58,.28);
 }
 :root[data-theme="dark"]{
   color-scheme:dark;
-  --plane:#0d0d0d; --surface:#1a1a19; --surface-2:#232321;
+  --plane:#141513; --surface:#1d1f1b; --surface-2:#262823;
+  --shadow:0 1px 2px rgba(0,0,0,.3);
   --ink:#ffffff; --ink-2:#c3c2b7; --muted:#898781;
   --grid:#2c2c2a; --axis:#383835; --border:rgba(255,255,255,.10);
   --s1:#3987e5; --s2:#d95926; --s3:#199e70; --s4:#c98500; --s5:#d55181; --s6:#008300; --s7:#9085e9; --s8:#e66767;
@@ -45,8 +48,8 @@ button.ghost{cursor:pointer}
 button.ghost:hover{background:var(--surface-2)}
 nav.tabs{display:flex;gap:2px;overflow-x:auto;padding:8px 0 0;scrollbar-width:none}
 nav.tabs::-webkit-scrollbar{display:none}
-nav.tabs button{background:none;border:0;border-bottom:2px solid transparent;color:var(--ink-2);
-  padding:9px 13px;font:inherit;font-size:14px;cursor:pointer;white-space:nowrap;border-radius:6px 6px 0 0}
+nav.tabs button{background:none;border:0;border-bottom:2.5px solid transparent;color:var(--ink-2);
+  padding:10px 14px;font:inherit;font-size:13.5px;font-weight:520;cursor:pointer;white-space:nowrap;border-radius:8px 8px 0 0}
 nav.tabs button:hover{background:var(--surface-2)}
 nav.tabs button[aria-selected=true]{color:var(--ink);font-weight:600;border-bottom-color:var(--s1)}
 section.tab{display:none;padding-top:18px}
@@ -54,16 +57,17 @@ section.tab.on{display:block}
 h2{font-size:19px;margin:26px 0 4px;letter-spacing:-.01em}
 h2:first-child{margin-top:6px}
 .sub{color:var(--muted);font-size:13px;margin:0 0 14px}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
 .grid{display:grid;gap:12px}
 .kpis{grid-template-columns:repeat(auto-fit,minmax(190px,1fr))}
 .kpi .lab{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.04em}
-.kpi .val{font-size:27px;font-weight:640;letter-spacing:-.02em;margin-top:5px;line-height:1.1}
+.kpi .val{font-size:24px;font-weight:660;letter-spacing:-.02em;margin-top:6px;line-height:1.1;font-variant-numeric:tabular-nums}
 .kpi .dlt{font-size:13px;margin-top:5px;color:var(--ink-2)}
 .up{color:var(--pos)} .dn{color:var(--neg)}
-.hero{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px 20px}
+.hero{background:linear-gradient(180deg,color-mix(in srgb,var(--brand) 4.5%,var(--surface)),var(--surface) 55%);
+  border:1px solid var(--border);border-radius:var(--radius);padding:24px 22px;box-shadow:var(--shadow)}
 .hero .lab{color:var(--muted);font-size:12.5px;text-transform:uppercase;letter-spacing:.05em}
-.hero .val{font-size:44px;font-weight:660;letter-spacing:-.03em;line-height:1.05;margin-top:6px}
+.hero .val{font-size:42px;font-weight:680;letter-spacing:-.03em;line-height:1.05;margin-top:7px;font-variant-numeric:tabular-nums}
 @media(max-width:640px){.hero .val{font-size:34px}}
 ul.bul{list-style:none;padding:0;margin:0}
 ul.bul li{padding:10px 0 10px 26px;border-bottom:1px solid var(--border);position:relative;font-size:14.5px}
@@ -76,12 +80,12 @@ ul.bul li.g::before{background:var(--good)}
 @media(max-width:640px){.chartbox{height:260px}}
 table{width:100%;border-collapse:collapse;font-size:13.5px}
 th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:top}
-th{color:var(--muted);font-weight:600;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em;
-  position:sticky;top:0;background:var(--surface);z-index:2}
+th{color:var(--muted);font-weight:620;font-size:11px;text-transform:uppercase;letter-spacing:.05em;
+  position:sticky;top:0;background:var(--surface);z-index:2;box-shadow:inset 0 -1px 0 var(--axis)}
 td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
 tbody tr:hover{background:var(--surface-2)}
-.scroll{overflow:auto;max-height:520px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface)}
-details{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:0 14px;margin:12px 0}
+.scroll{overflow:auto;max-height:520px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);box-shadow:var(--shadow)}
+details{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:0 16px;margin:12px 0;box-shadow:var(--shadow)}
 details[open]{padding-bottom:12px}
 summary{cursor:pointer;padding:12px 0;font-weight:560;font-size:14px;list-style:none;display:flex;align-items:center;gap:8px}
 summary::-webkit-details-marker{display:none}
@@ -116,7 +120,7 @@ details .body{font-size:14px;color:var(--ink-2);padding-bottom:4px}
   border-radius:9px;background:transparent;cursor:pointer;font:inherit;font-size:12px;color:var(--ink-2);
   transition:border-color .15s,background .15s}
 .marca:hover{background:var(--surface-2)}
-.marca img{height:22px;width:auto;display:block;border-radius:3px}
+.marca img{height:22px;width:auto;display:block;border-radius:5px;padding:2px 4px;box-sizing:content-box}
 .marca .lab{text-align:left;line-height:1.15}
 .marca .lab b{display:block;font-size:12.5px;color:var(--ink);font-weight:600}
 .marca .lab span{font-size:10.5px;color:var(--muted);font-variant-numeric:tabular-nums}
@@ -140,13 +144,24 @@ ul.bul li::before{background:var(--brand)}
 .brandchip img{height:18px;width:auto;border-radius:2px;display:block}
 .divgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
 .divcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
-  padding:14px;border-top:3px solid var(--dc)}
-.divcard .lg{height:26px;width:auto;border-radius:3px;display:block;margin-bottom:10px}
+  padding:16px;border-top:3px solid var(--dc);box-shadow:var(--shadow);transition:transform .12s,box-shadow .12s}
+.divcard:hover{transform:translateY(-2px);box-shadow:0 4px 14px rgba(20,24,15,.10)}
+.divcard .lg{height:28px;width:auto;border-radius:6px;display:block;margin-bottom:12px;padding:3px 6px;box-sizing:content-box}
 .divcard .v{font-size:22px;font-weight:640;letter-spacing:-.02em}
 .divcard .k{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
 .divcard .r{display:flex;justify-content:space-between;align-items:baseline;margin-top:8px;
   padding-top:8px;border-top:1px solid var(--border);font-size:12.5px;color:var(--ink-2)}
 .foot{color:var(--muted);font-size:12px;margin-top:34px;padding-top:14px;border-top:1px solid var(--border)}
+
+@media print{
+  :root{--plane:#ffffff}
+  .brandbar .marcas,.topin select,.topin button,.topin label,.filters,#btnTema,nav.tabs{display:none!important}
+  header.top{position:static;border-top-width:6px}
+  .card,.hero,.scroll,details{box-shadow:none}
+  .scroll{max-height:none;overflow:visible}
+  .chartbox{height:280px}
+  a{color:inherit;text-decoration:none}
+}
 </style>
 </head>
 <body>
@@ -210,9 +225,9 @@ ul.bul li::before{background:var(--brand)}
     <div class="card"><div style="font-weight:600;font-size:14.5px">Tesorería por mes</div>
       <div class="sub">Suma de saldos bancarios informados, sin duplicados</div>
       <div class="chartbox sm"><canvas id="chTesMes"></canvas></div>
-      <div class="note">Las celdas sin dato no se computan como cero. Ver Calidad de datos.</div></div>
-    <div class="card"><div style="font-weight:600;font-size:14.5px">Tesorería vs deuda bancaria</div>
-      <div class="sub">Evolución mensual del ámbito seleccionado</div>
+      <div class="note" id="notaTesMes"></div></div>
+    <div class="card"><div style="font-weight:600;font-size:14.5px">Deuda financiera neta</div>
+      <div class="sub">Deuda bancaria dispuesta menos tesorería</div>
       <div class="chartbox sm"><canvas id="chTesDeu"></canvas></div></div>
   </div>
   <details><summary>Cómo se calcula esta portada</summary><div class="body">
@@ -555,7 +570,7 @@ function vacio(msg){return `<div class="card" style="text-align:center;padding:4
 function portada(){
   const m=MESSEL, pv=MESES[MESES.indexOf(m)-1];
   const t=tes(m), tp=pv?tes(pv):null, d=deu(m), dp=pv?deu(pv):null;
-  document.getElementById('heroTes').textContent=eur(t);
+  document.getElementById('heroTes').textContent=eur0(t);
   document.getElementById('heroDelta').innerHTML=(tp==null||t==null)?'':
     `<span class="${signCls(t-tp)}">${signTxt(t-tp)}</span> vs ${MES[pv].toLowerCase()}${tp?` (${((t-tp)/Math.abs(tp)*100).toFixed(1).replace('.',',')} %)`:''}`;
   const inf=SAL.filter(r=>r.m===m&&r.s!==null&&enAmbito(r.soc)).length,
@@ -564,7 +579,7 @@ function portada(){
   document.getElementById('heroNota').textContent=`${inf} de ${tot} cuentas con saldo informado · ${nS} sociedad${nS===1?'':'es'}`;
   document.getElementById('heroTesLab').textContent='Posición total de tesorería · '+nombreAmbito();
 
-  document.getElementById('heroDeu').textContent=eur(d);
+  document.getElementById('heroDeu').textContent=eur0(d);
   document.getElementById('heroDeuDelta').innerHTML=dp==null?'':`<span class="${signCls(-(d-dp))}">${signTxt(d-dp)}</span> vs ${MES[pv].toLowerCase()}`;
   document.getElementById('heroDeuNota').textContent=`${DATA.deuda.filter(r=>r.m===m&&r.p!=null&&enAmbito(r.soc)).length} productos vivos`;
   document.getElementById('heroDeuLab').textContent='Deuda bancaria dispuesta · '+nombreAmbito();
@@ -602,7 +617,7 @@ function bullets(m){
   }
   const porB={}; SAL.filter(r=>r.m===m&&r.s!==null&&enAmbito(r.soc)).forEach(r=>{const b=CTA[r.cta].banco; porB[b]=(porB[b]||0)+r.s;});
   const bs=Object.entries(porB).sort((a,b)=>b[1]-a[1]); const t=tes(m);
-  if(bs.length&&t>0)out.push({t:`El <b>${(bs[0][1]/t*100).toFixed(0)} %</b> de la caja (${eur0(bs[0][1])}) está en <b>${esc(bs[0][0])}</b>${bs.length>2?`. Las tres primeras entidades concentran el ${(bs.slice(0,3).reduce((a,x)=>a+x[1],0)/t*100).toFixed(0)} %`:''}.`,c:bs[0][1]/t>0.6?'w':''});
+  if(bs.length&&t>0)out.push({t:`El <b>${(bs[0][1]/t*100).toFixed(0)} %</b> de la caja (${eur0(bs[0][1])}) está en <b>${esc(bs[0][0])}</b>${bs.length>3?`. Las tres primeras entidades concentran el ${(bs.slice(0,3).reduce((a,x)=>a+x[1],0)/t*100).toFixed(0)} %`:''}.`,c:bs[0][1]/t>0.6?'w':''});
   out.push({t:`Deuda financiera neta de <b>${kEur(deu(m)-(t||0))}</b>, con <b>${eur0(disp(m))}</b> aún disponible en pólizas y líneas de anticipo.`,c:''});
   if(hayDiario(SOCSEL)){const c=cobM(m),p=pagM(m);
     out.push({t:`Flujo neto del mes de <b class="${signCls(c+p)}">${signTxt(c+p)}</b> (${eur0(c)} cobrados, ${eur0(Math.abs(p))} pagados), con saldo contable de ${eur(saldoFinMes(m))}.`,c:(c+p)<0?'w':'g'});
@@ -624,18 +639,43 @@ const kTick=function(v,i,ticks){            // unidad uniforme por eje, tomada d
   return mx>=1e6 ? (v/1e6).toLocaleString('es-ES',{maximumFractionDigits:1})+' M'
                  : (v/1000).toLocaleString('es-ES',{maximumFractionDigits:0})+'k';};
 const leg=()=>({position:'bottom',labels:{color:cv('--ink-2'),boxWidth:10,boxHeight:10,usePointStyle:true,pointStyle:'rectRounded',font:{size:11.5}}});
+function mesIncompleto(m){
+  // una sociedad se considera sin reportar si informa menos de la mitad
+  // de las cuentas que informa en su mejor mes
+  return socsAmbito().some(sid=>{
+    const porMes=MESES.map(x=>SAL.filter(r=>r.soc===sid&&r.m===x&&r.s!==null).length);
+    const max=Math.max(...porMes);
+    return max>0 && porMes[MESES.indexOf(m)] < max*0.5;
+  });
+}
 function chartTesMes(){
-  chart('chTesMes',{type:'bar',data:{labels:MESES.map(m=>MES[m].slice(0,3)),
-    datasets:[{data:MESES.map(m=>tes(m)),backgroundColor:cv('--brand'),borderRadius:4,borderSkipped:false,maxBarThickness:44}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>eur(c.raw)}}},
+  const base=cv('--brand');
+  const inc=MESES.map(mesIncompleto);
+  chart('chTesMes',{type:'bar',data:{labels:MESES.map((m,i)=>MES[m].slice(0,3)+(inc[i]?' *':'')),
+    datasets:[{data:MESES.map(m=>tes(m)),
+      backgroundColor:MESES.map((m,i)=>inc[i]?base+'4d':base),
+      borderColor:MESES.map((m,i)=>inc[i]?base+'99':base),
+      borderWidth:MESES.map((m,i)=>inc[i]?1.5:0),
+      borderRadius:4,borderSkipped:false,maxBarThickness:44}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},
+      tooltip:{callbacks:{label:c=>eur(c.raw),
+        footer:it=>inc[it[0].dataIndex]?'* Mes con sociedades sin saldo informado:\nel total real es mayor.':''}}},
       scales:{x:gridOpts(),y:{...gridOpts(),ticks:{...gridOpts().ticks,callback:kTick}}}}});
+  const nota=document.getElementById('notaTesMes');
+  if(nota) nota.textContent = inc.some(Boolean)
+    ? 'Los meses marcados con * tienen sociedades sin saldo informado: su barra infravalora la caja real. Detalle en Calidad de datos.'
+    : 'Todas las sociedades del ámbito reportan en todos los meses.';
 }
 function chartTesDeu(){
+  const base=cv('--brand');
+  const dfn=MESES.map(m=>deu(m)-(tes(m)||0));
   chart('chTesDeu',{type:'line',data:{labels:MESES.map(m=>MES[m].slice(0,3)),datasets:[
-    {label:'Deuda bancaria',data:MESES.map(m=>deu(m)),borderColor:cv('--s2'),backgroundColor:'transparent',borderWidth:2,pointRadius:4,pointBackgroundColor:cv('--s2'),pointBorderColor:cv('--surface'),pointBorderWidth:2,tension:.25},
-    {label:'Tesorería',data:MESES.map(m=>tes(m)),borderColor:cv('--s1'),backgroundColor:'transparent',borderWidth:2,pointRadius:4,pointBackgroundColor:cv('--s1'),pointBorderColor:cv('--surface'),pointBorderWidth:2,tension:.25}]},
+    {label:'Deuda financiera neta',data:dfn,borderColor:base,backgroundColor:base+'1f',fill:true,
+     borderWidth:2.5,pointRadius:4,pointBackgroundColor:base,pointBorderColor:cv('--surface'),pointBorderWidth:2,tension:.28}]},
     options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
-      plugins:{legend:leg(),tooltip:{callbacks:{label:c=>c.dataset.label+': '+eur(c.raw)}}},
+      plugins:{legend:{display:false},
+        tooltip:{callbacks:{label:c=>'DFN: '+eur(c.raw),
+          footer:it=>{const m=MESES[it[0].dataIndex];return 'Deuda '+kEur(deu(m))+'  ·  Tesorería '+kEur(tes(m)||0);}}}},
       scales:{x:gridOpts(),y:{...gridOpts(),ticks:{...gridOpts().ticks,callback:kTick}}}}});
 }
 
@@ -1073,8 +1113,6 @@ function init(){
     document.documentElement.setAttribute('data-theme',c==='dark'?'light':'dark');
     if(HASCHART())Chart.defaults.color=cv('--ink-2');
     aplicarMarca(); limpiarCharts(); repintar(); barraMarcas();};
-  if(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)
-    document.documentElement.setAttribute('data-theme','dark');
   if(HASCHART()){
     Chart.defaults.font.family='system-ui,-apple-system,"Segoe UI",sans-serif';
     Chart.defaults.color=cv('--ink-2');
