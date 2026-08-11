@@ -648,8 +648,8 @@ function portada(){
   document.getElementById('kCob').textContent=hd?kEur(c):'s/d';
   document.getElementById('kPag').textContent=hd?kEur(p):'s/d';
   document.getElementById('kNet').innerHTML=hd?`<span class="${signCls(c+p)}">${kEur(c+p)}</span>`:'s/d';
-  const nota=hd?(cobertura().n===cobertura().total?'':`sólo ${cobertura().socs.join(', ')}`):'sin libro diario disponible';
-  ['kCobd','kPagd','kNetd'].forEach(i=>document.getElementById(i).textContent=nota||'libro diario');
+  const nota=hd?(cobertura().n===cobertura().total?'libro diario':`diario de ${cobertura().n} de ${cobertura().total} sociedades`):'sin libro diario disponible';
+  ['kCobd','kPagd','kNetd'].forEach(i=>document.getElementById(i).textContent=nota);
   document.getElementById('kDisp').textContent=kEur(disp(m));
   document.getElementById('kDispd').textContent=`sobre ${kEur(limi(m))} de límite`;
 
@@ -796,7 +796,8 @@ function bancos(){
   const box=document.getElementById('boxDiario');
   if(hayDiario(SOCSEL)){box.innerHTML=box.dataset.tpl; chartDiario();
     document.getElementById('selGranularidad').onchange=chartDiario;
-    document.getElementById('hDiario').textContent=`Evolución diaria real · ${cobertura().socs.join(', ')}`;
+    const cd=cobertura();
+    document.getElementById('hDiario').textContent='Evolución diaria real'+(multiSoc()?(cd.n===cd.total?'':` · diario de ${cd.n} de ${cd.total} sociedades`):'');
   }else{document.getElementById('hDiario').textContent='Evolución diaria real';
     box.innerHTML=vacio('La curva diaria de tesorería requiere libro diario. Para esta sociedad sólo hay saldos de cierre mensual, que se muestran en la tabla de arriba.');}
   tablaCtas(); tablaDeuda();
