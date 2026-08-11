@@ -804,20 +804,41 @@ function bancos(){
   document.getElementById('hdrMes2').textContent=MES[MESSEL]+' 2026';
 }
 function chartDiario(){
-  let rows=serieDiaria(); if(!rows.length)return;
+  const full=serieDiaria(); if(!full.length)return;
   const g=document.getElementById('selGranularidad').value;
-  if(g==='w')rows=rows.filter(r=>new Date(r.f+'T00:00').getDay()===5||r.f===ult(serieDiaria()).f);
-  const ctas=Object.keys(ult(rows).cta);
+  const keep=full.map((r,i)=>g!=='w'||new Date(r.f+'T00:00').getDay()===5||i===full.length-1);
+  const rows=full.filter((_,i)=>keep[i]);
   const C=SERIES();
-  const dss=ctas.map((c,i)=>({label:CTA[c]?`${CTA[c].banco}${multiSoc()?' · '+SOCN[CTA[c].soc]:''}`:c,
-    data:rows.map(r=>r.cta[c]??null),borderColor:C[i%8],backgroundColor:'transparent',borderWidth:2,pointRadius:0,pointHoverRadius:5,tension:.15}));
+  let dss,legHTML;
+  if(multiSoc()){
+    // una línea por sociedad (total diario con arrastre), no por cuenta
+    const socs=[...new Set(DATA.saldosDia.filter(r=>enAmbito(r.soc)).map(r=>r.soc))];
+    const fechas=full.map(r=>r.f);
+    const series=socs.map(s=>{
+      const m={}; DATA.saldosDia.filter(r=>r.soc===s).forEach(r=>{m[r.f]=Object.values(r.v).reduce((x,v)=>x+v,0);});
+      let last=null; const d=fechas.map(f=>{if(m[f]!=null)last=m[f]; return last;});
+      return {s,d:d.filter((_,i)=>keep[i])};
+    }).sort((a,b)=>Math.abs(ult(b.d)||0)-Math.abs(ult(a.d)||0));
+    dss=series.map((x,i)=>({label:SOCN[x.s],data:x.d,borderColor:C[i%8],backgroundColor:'transparent',
+      borderWidth:2,pointRadius:0,pointHoverRadius:5,tension:.15,spanGaps:true}));
+    legHTML=series.map((x,i)=>`<span><i style="background:${C[i%8]}"></i>${esc(SOCN[x.s])} · <b>${eur(ult(x.d))}</b></span>`).join('');
+  }else{
+    // una sociedad: seis mayores cuentas y el resto agregado
+    const ctasAll=Object.keys(ult(rows).cta).sort((a,b)=>Math.abs(ult(rows).cta[b]||0)-Math.abs(ult(rows).cta[a]||0));
+    const top=ctasAll.slice(0,6), rest=ctasAll.slice(6);
+    dss=top.map((c,i)=>({label:CTA[c]?CTA[c].banco:c,data:rows.map(r=>r.cta[c]??null),
+      borderColor:C[i%8],backgroundColor:'transparent',borderWidth:2,pointRadius:0,pointHoverRadius:5,tension:.15,spanGaps:true}));
+    if(rest.length)dss.push({label:`Resto (${rest.length} cuentas)`,data:rows.map(r=>rest.reduce((a,c)=>a+(r.cta[c]||0),0)),
+      borderColor:C[6],backgroundColor:'transparent',borderWidth:1.5,borderDash:[5,4],pointRadius:0,pointHoverRadius:5,tension:.15});
+    legHTML=top.map((c,i)=>`<span><i style="background:${C[i%8]}"></i>${esc(CTA[c]?CTA[c].banco:c)} · <b>${eur(ult(rows).cta[c])}</b></span>`).join('')
+      +(rest.length?`<span><i style="background:${C[6]}"></i>Resto (${rest.length}) · <b>${eur(rest.reduce((a,c)=>a+(ult(rows).cta[c]||0),0))}</b></span>`:'');
+  }
   chart('chDiario',{type:'line',data:{labels:rows.map(r=>fdate(r.f)),datasets:dss},
     options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
-      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+': '+eur(c.raw),footer:it=>'Total: '+eur(it.reduce((a,x)=>a+x.raw,0))}}},
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+': '+eur(c.raw),footer:it=>'Total: '+eur(it.reduce((a,x)=>a+(x.raw||0),0))}}},
       scales:{x:{...gridOpts(),grid:{display:false},ticks:{...gridOpts().ticks,maxTicksLimit:9,autoSkip:true}},
         y:{...gridOpts(),ticks:{...gridOpts().ticks,callback:kTick}}}}});
-  document.getElementById('legDiario').innerHTML=ctas.map((c,i)=>
-    `<span><i style="background:${C[i%8]}"></i>${esc(CTA[c]?CTA[c].banco:c)} · <b>${eur(ult(rows).cta[c])}</b></span>`).join('');
+  document.getElementById('legDiario').innerHTML=legHTML;
 }
 function tablaCtas(){
   const q=(document.getElementById('qBanco').value||'').toLowerCase();
