@@ -738,7 +738,7 @@ function chartTesDeu(){
 function bancos(){
   const socs=socsAmbito().filter(s=>SAL.some(r=>r.soc===s));
   const top=document.getElementById('bancTop');
-  if(SOCSEL!=='GRUPO'&&!SAL.some(r=>r.soc===SOCSEL)){
+  if(SOCSEL!=='GRUPO'&&!esDiv(SOCSEL)&&!SAL.some(r=>r.soc===SOCSEL)){
     document.getElementById('hSoc').textContent='Posición · '+SOCN[SOCSEL];
     top.innerHTML=vacio('Esta sociedad todavía no tiene cuentas bancarias volcadas en <code>DATA.cuentas</code> ni saldos en <code>DATA.saldosMes</code>.');
     document.getElementById('hDiario').textContent='Evolución diaria real';
