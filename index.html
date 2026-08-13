@@ -1853,7 +1853,7 @@ const EXPL={
  heroTes:(mes)=>{const m=mes||MESSEL,r=SAL.filter(x=>x.m===m&&enAmbito(x.soc));
    const con=r.filter(x=>x.s!==null),pol=DATA.saldosMes.filter(x=>x.m===m&&enAmbito(x.soc)&&x.src==='pol');
    const bySoc={};con.forEach(x=>{(bySoc[x.soc]=bySoc[x.soc]||[]).push(x);});
-   return{t:'Posición total de tesorería',sub:`Saldo bancario a cierre de ${MES[m].toLowerCase()} de ${MES[m]?'':''}`.trim()+` ${MES[m]} 2026`,
+   return{t:'Posición total de tesorería',sub:`Saldo bancario a cierre de ${MES[m].toLowerCase()} de 2026`,
    frm:`<b>Tesorería = suma de los saldos informados en la posición del mes</b><br>
      ${con.length} de ${r.length} cuentas con saldo · ${Object.keys(bySoc).length} sociedades · <b>${eur(tes(m)||0)}</b><br>
      Se excluye cada IBAN repetido dentro de una misma sociedad y las cuentas de crédito cuya posición era el disponible.`,
