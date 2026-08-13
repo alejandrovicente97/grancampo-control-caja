@@ -165,6 +165,21 @@ ul.bul li::before{background:var(--brand)}
 }
 tr.subrow td{font-size:12.5px;border-top:1px dashed var(--line)}
 tr.subrow td:first-child{font-weight:450}
+
+ul.incul{margin:8px 0 0;padding:0;list-style:none}
+li.incli{margin:0;border-top:1px solid var(--line)}
+li.incli:first-child{border-top:0}
+li.incli>details>summary{list-style:none;cursor:pointer;display:flex;gap:9px;align-items:baseline;
+  padding:7px 4px;border-radius:6px;font-size:13.5px;line-height:1.45}
+li.incli>details>summary::-webkit-details-marker{display:none}
+li.incli>details>summary::before{content:'\203A';color:var(--muted);font-size:15px;line-height:1;
+  transition:transform .15s ease;display:inline-block;width:9px;flex:none}
+li.incli>details[open]>summary::before{transform:rotate(90deg)}
+li.incli>details>summary:hover{background:var(--surface-2)}
+li.incli .ti{flex:1}
+li.incli .im{color:var(--ink-2);font-variant-numeric:tabular-nums;white-space:nowrap}
+li.incli .incd{padding:2px 4px 12px 22px;font-size:13px;line-height:1.6;color:var(--ink-2)}
+li.incli .incd p{margin:0 0 6px}
 </style>
 </head>
 <body>
@@ -698,12 +713,17 @@ function bullets(m){
   if(inc.length){
     const S={alta:0,media:1,baja:2}, LB={alta:'alta',media:'media',baja:'baja'};
     const lista=inc.slice().sort((x,y)=>S[x.sev]-S[y.sev]||(y.imp||0)-(x.imp||0))
-      .map(i=>`<li style="margin:4px 0;display:flex;gap:8px;align-items:baseline"><span class="pill ${i.sev==='alta'?'bad':(i.sev==='media'?'wr':'')}">${LB[i.sev]}</span>
-         ${esc(i.t)}${i.imp?` <span style="color:var(--ink-2);font-variant-numeric:tabular-nums">· ${eur0(i.imp)}</span>`:''}</li>`).join('');
+      .map(i=>`<li class="incli"><details><summary>
+         <span class="pill ${i.sev==='alta'?'bad':(i.sev==='media'?'wr':'')}">${LB[i.sev]}</span>
+         <span class="ti">${esc(i.t)}</span>
+         ${i.imp?`<span class="im">${eur0(i.imp)}</span>`:''}</summary>
+         <div class="incd"><p>${i.d}</p>
+         <p class="note">Sociedades: ${i.socs.length?i.socs.map(s=>esc(SOCN[s]||s)).join(', '):'todo el grupo'} · Meses: ${i.meses.map(x=>MES[x]).join(', ')} · Fuente: ${esc(i.src)}</p></div>
+         </details></li>`).join('');
     out.push({t:`<b>${inc.length} incidencia${inc.length>1?'s':''} de calidad</b> afecta${inc.length>1?'n':''} a este ámbito por ${eur0(inc.reduce((a,i)=>a+(i.imp||0),0))}. Nada se ha corregido.
       <details style="margin-top:6px"><summary style="cursor:pointer;color:var(--ink-2);font-size:13px">Ver las ${inc.length} incidencias</summary>
-      <ul style="margin:8px 0 0;padding:0;list-style:none;font-size:13.5px;line-height:1.55">${lista}</ul>
-      <p class="note" style="margin:8px 0 0">El detalle completo de cada una, con su origen y su explicación, está en la pestaña <b>Calidad de datos</b>.</p></details>`,c:'c'});}
+      <ul class="incul">${lista}</ul>
+      <p class="note" style="margin:10px 0 0">Pulsa cualquier incidencia para desplegar su explicación completa. También están todas, con sus tablas de apoyo, en la pestaña <b>Calidad de datos</b>.</p></details>`,c:'c'});}
   const car=DATA.cartera.filter(x=>enAmbito(x.soc));
   if(m===ULT&&car.length){const cc=car.filter(x=>x.tipo==='cobro').reduce((a,x)=>a+x.i,0), pp=car.filter(x=>x.tipo==='pago').reduce((a,x)=>a+x.i,0);
     out.push({t:`Cartera viva a 05/08: <b>${eur0(cc)}</b> por cobrar frente a <b>${eur0(pp)}</b> por pagar. Diferencia de <b class="${signCls(cc-pp)}">${signTxt(cc-pp)}</b> a cubrir con caja.`,c:cc<pp?'w':'g'});}
