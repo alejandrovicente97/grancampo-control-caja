@@ -180,6 +180,19 @@ li.incli .ti{flex:1}
 li.incli .im{color:var(--ink-2);font-variant-numeric:tabular-nums;white-space:nowrap}
 li.incli .incd{padding:2px 4px 12px 22px;font-size:13px;line-height:1.6;color:var(--ink-2)}
 li.incli .incd p{margin:0 0 6px}
+
+#ovl{position:fixed;inset:0;background:rgba(20,22,20,.42);backdrop-filter:blur(2px);z-index:90;
+  display:none;align-items:flex-start;justify-content:center;padding:36px 16px;overflow:auto}
+#ovl.on{display:flex}
+#ovl .box{background:var(--surface);border:1px solid var(--line);border-radius:14px;max-width:940px;width:100%;
+  box-shadow:0 18px 50px rgba(0,0,0,.18);padding:22px 24px 26px}
+#ovl h3{margin:0 0 2px;font-size:19px;letter-spacing:-.01em}
+#ovl .cls{position:absolute;right:26px;top:26px;border:1px solid var(--line);background:var(--surface);
+  border-radius:8px;padding:4px 10px;cursor:pointer;color:var(--ink-2);font-size:13px}
+#ovl .frm{background:var(--surface-2);border-radius:9px;padding:12px 14px;margin:12px 0;font-size:13.5px;line-height:1.6}
+.kpi.clic{cursor:pointer;transition:border-color .15s ease,box-shadow .15s ease}
+.kpi.clic:hover{border-color:var(--brand);box-shadow:0 2px 10px rgba(0,0,0,.06)}
+.kpi .vermas{font-size:11px;color:var(--muted);margin-top:4px}
 </style>
 </head>
 <body>
@@ -229,7 +242,7 @@ li.incli .incd p{margin:0 0 6px}
       <div class="val" id="heroDeu">—</div><div class="dlt" id="heroDeuDelta"></div><div class="note" id="heroDeuNota"></div></div>
   </div>
   <div class="grid kpis" style="margin-top:12px">
-    <div class="card kpi"><div class="lab">Meses de cobertura</div><div class="val" id="kCov">—</div><div class="dlt" id="kCovd"></div></div>
+    <div class="card kpi clic" id="covCard"><div class="lab">Meses de cobertura</div><div class="val" id="kCov">—</div><div class="dlt" id="kCovd"></div><div class="vermas">ver el cálculo ›</div></div>
     <div class="card kpi"><div class="lab">Deuda financiera neta</div><div class="val" id="kDN">—</div><div class="dlt" id="kDNd"></div></div>
     <div class="card kpi"><div class="lab">Cobros del mes</div><div class="val" id="kCob">—</div><div class="dlt" id="kCobd"></div></div>
     <div class="card kpi"><div class="lab">Pagos del mes</div><div class="val" id="kPag">—</div><div class="dlt" id="kPagd"></div></div>
@@ -455,10 +468,10 @@ li.incli .incd p{margin:0 0 6px}
   <div id="prevBanner"></div>
   <div id="prevBody">
     <div class="grid kpis">
-      <div class="card kpi"><div class="lab">Caja de partida</div><div class="val" id="pIni">—</div><div class="dlt" id="pInid"></div></div>
-      <div class="card kpi"><div class="lab">Punto más bajo</div><div class="val" id="pMin">—</div><div class="dlt" id="pMind"></div></div>
-      <div class="card kpi"><div class="lab">Caja a 13 semanas</div><div class="val" id="pFin">—</div><div class="dlt" id="pFind"></div></div>
-      <div class="card kpi"><div class="lab">Semanas en negativo</div><div class="val" id="pNeg">—</div><div class="dlt" id="pNegd"></div></div>
+      <div class="card kpi clic" data-prev="1"><div class="lab">Caja de partida</div><div class="val" id="pIni">—</div><div class="dlt" id="pInid"></div><div class="vermas">ver el cálculo ›</div></div>
+      <div class="card kpi clic" data-prev="1"><div class="lab">Punto más bajo</div><div class="val" id="pMin">—</div><div class="dlt" id="pMind"></div><div class="vermas">ver el cálculo ›</div></div>
+      <div class="card kpi clic" data-prev="1"><div class="lab">Caja a 13 semanas</div><div class="val" id="pFin">—</div><div class="dlt" id="pFind"></div><div class="vermas">ver el cálculo ›</div></div>
+      <div class="card kpi clic" data-prev="1"><div class="lab">Semanas en negativo</div><div class="val" id="pNeg">—</div><div class="dlt" id="pNegd"></div><div class="vermas">ver el cálculo ›</div></div>
     </div>
 
     <div class="card" style="margin-top:12px">
@@ -473,6 +486,10 @@ li.incli .incd p{margin:0 0 6px}
       </div>
       <div class="chartbox"><canvas id="chPrev"></canvas></div>
       <div class="note" id="prevNota"></div>
+      <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="tag" style="cursor:pointer;border:1px solid var(--line);background:var(--surface);padding:5px 12px" onclick="verPrev()">Ver el cálculo, línea a línea ›</button>
+        <button class="tag" style="cursor:pointer;border:1px solid var(--line);background:var(--surface);padding:5px 12px" onclick="csvPrev()">Descargar en Excel</button>
+      </div>
     </div>
 
     <h2>Semana a semana</h2>
@@ -579,6 +596,9 @@ li.incli .incd p{margin:0 0 6px}
 
 <p class="foot"><b>Última actualización de datos: <span id="footGen">—</span>.</b> Fuentes: Libro Diario Grancampo enero–julio 2026 · Posición Tesorera mensual enero–julio 2026 · Balance de sumas y saldos julio 2026 (Grancampo y Promociones) · Cartera de cobros y pagos a 05/08/2026. Importes en euros. Estructura preparada para las 10 sociedades del perímetro: ampliar es volcar datos en <code>const DATA</code>, sin tocar la lógica.</p>
 </div>
+
+<!-- ventana de cálculo -->
+<div id="ovl"><div class="box" style="position:relative"><button class="cls" onclick="cerrarOvl()">Cerrar ✕</button><div id="ovlBody"></div></div></div>
 
 <script>
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -1499,6 +1519,162 @@ function alertas(P){
      <div class="body"><p>${x.d}</p></div></details>`).join('');
 }
 
+
+/* ═══════════════════════ VENTANA DE CÁLCULO ═══════════════════════ */
+function abrirOvl(html){document.getElementById('ovlBody').innerHTML=html;
+  document.getElementById('ovl').classList.add('on');document.body.style.overflow='hidden';}
+function cerrarOvl(){document.getElementById('ovl').classList.remove('on');document.body.style.overflow='';}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')cerrarOvl();});
+document.addEventListener('click',e=>{if(e.target&&e.target.id==='ovl')cerrarOvl();});
+function bajarCSV(nombre,cab,filas){
+  const q=x=>'"'+String(x==null?'':x).replace(/"/g,'""')+'"';
+  const b=new Blob(['﻿'+[cab.map(q).join(';'),...filas.map(f=>f.map(q).join(';'))].join('\n')],
+    {type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=nombre;a.click();
+}
+
+/* ── 1) cálculo de los meses de cobertura ── */
+function verCobertura(){
+  const M=movsAmbito(); if(!M.length){abrirOvl('<h3>Meses de cobertura</h3><p class="sub">Este ámbito no tiene libro diario, así que no puede calcularse.</p>');return;}
+  const B=burnAmbito(), t=tes(MESSEL)||0, pol=disp(MESSEL), liq=t+pol;
+  const asi={}; M.forEach(r=>{const k=r.soc+'|'+r.asi;(asi[k]=asi[k]||[]).push(r);});
+  const compA=new Set(Object.keys(asi).filter(k=>{
+    const P=asi[k].filter(r=>r.imp>0).reduce((a,r)=>a+r.imp,0), N=-asi[k].filter(r=>r.imp<0).reduce((a,r)=>a+r.imp,0);
+    return Math.min(P,N)>0.005;}));
+  const nm=B.nm;
+  const pagoBruto=M.filter(r=>r.imp<0).reduce((a,r)=>a-r.imp,0)/nm;
+  const grp=M.filter(r=>r.imp<0&&r.cat==='Grupo y socios').reduce((a,r)=>a-r.imp,0)/nm;
+  const cmp=M.filter(r=>r.imp<0&&compA.has(r.soc+'|'+r.asi)&&r.cat!=='Grupo y socios').reduce((a,r)=>a-r.imp,0)/nm;
+  const finB=M.filter(r=>r.imp<0&&r.cat==='Financieros'&&!compA.has(r.soc+'|'+r.asi)).reduce((a,r)=>a-r.imp,0)/nm;
+  const cats={}; M.filter(r=>r.imp<0&&r.cat!=='Grupo y socios'&&r.cat!=='Financieros'&&!compA.has(r.soc+'|'+r.asi))
+    .forEach(r=>{cats[r.cat]=(cats[r.cat]||0)-r.imp;});
+  const fil=v=>`<td class="n">${nf0.format(v)}</td>`;
+  let paso=`<table style="margin-top:4px"><thead><tr><th>Paso</th><th class="n">€/mes</th><th>Por qué</th></tr></thead><tbody>
+    <tr><td><b>Pagos brutos del periodo</b></td>${fil(pagoBruto)}<td class="note" style="margin:0">Todo lo que sale con signo negativo en el diario, ${nm} meses</td></tr>
+    <tr><td>− Movimientos con el grupo</td>${fil(-grp)}<td class="note" style="margin:0">Dinero que se mueve dentro del perímetro; no sale del grupo</td></tr>
+    <tr><td>− Parte compensada</td>${fil(-cmp)}<td class="note" style="margin:0">Asientos que netean cobro y pago: sólo la diferencia pasó por el banco</td></tr>
+    <tr><td>− Financieros por su bruto</td>${fil(-finB)}<td class="note" style="margin:0">Se retira para sustituirlo por el neto de la línea siguiente</td></tr>
+    <tr style="background:var(--surface-2)"><td><b>= Pagos operativos</b></td>${fil(B.ope)}<td class="note" style="margin:0">Proveedores, compras, nóminas, impuestos y estructura</td></tr>
+    <tr><td>+ Servicio neto de la deuda</td>${fil(B.fin)}<td class="note" style="margin:0">Financieros en neto: las disposiciones de póliza compensan sus devoluciones</td></tr>
+    <tr style="font-weight:650;background:var(--surface-2)"><td>= SALIDA RECURRENTE</td>${fil(B.tot)}<td class="note" style="margin:0">El denominador de la cobertura</td></tr>
+  </tbody></table>`;
+  const ordc=Object.entries(cats).sort((a,b)=>b[1]-a[1]);
+  let det=`<table style="margin-top:4px"><thead><tr><th>Categoría operativa</th><th class="n">Total ${nm} meses</th><th class="n">€/mes</th><th class="n">Peso</th></tr></thead><tbody>`
+    +ordc.map(([k,v])=>`<tr><td>${esc(k)}</td><td class="n">${nf0.format(v)}</td><td class="n">${nf0.format(v/nm)}</td><td class="n">${(100*v/B.ope/nm).toFixed(1)} %</td></tr>`).join('')
+    +`<tr style="font-weight:650;background:var(--surface-2)"><td>TOTAL OPERATIVO</td><td class="n">${nf0.format(B.ope*nm)}</td><td class="n">${nf0.format(B.ope)}</td><td class="n">100 %</td></tr></tbody></table>`;
+  let mes=`<table style="margin-top:4px"><thead><tr><th>Mes</th><th class="n">Operativo</th><th class="n">Servicio deuda</th><th class="n">Salida recurrente</th><th class="n">Caja fin de mes</th><th class="n">Cobertura</th></tr></thead><tbody>`;
+  MESES.forEach(m=>{
+    const Mm=M.filter(r=>r.m===m);
+    const o=Mm.filter(r=>r.imp<0&&r.cat!=='Grupo y socios'&&r.cat!=='Financieros'&&!compA.has(r.soc+'|'+r.asi)).reduce((a,r)=>a-r.imp,0);
+    const f=Math.max(0,-Mm.filter(r=>r.cat==='Financieros').reduce((a,r)=>a+r.imp,0));
+    const tm=tes(m), lm=(tm||0)+disp(m), s=o+f;
+    mes+=`<tr${m===MESSEL?' style="background:var(--surface-2);font-weight:600"':''}><td>${MES[m]}</td><td class="n">${nf0.format(o)}</td><td class="n">${nf0.format(f)}</td>
+      <td class="n">${nf0.format(s)}</td><td class="n">${tm==null?'—':nf0.format(tm)}</td>
+      <td class="n">${s>0&&tm!=null?(lm/s).toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2}):'—'}</td></tr>`;});
+  mes+='</tbody></table>';
+  abrirOvl(`<h3>Meses de cobertura · ${esc(nombreAmbito())}</h3>
+    <p class="sub">Cuántos meses aguanta la liquidez disponible al ritmo de salida habitual</p>
+    <div class="frm"><b>Cobertura = ( caja + pólizas sin disponer ) ÷ salida recurrente mensual</b><br>
+      ( ${eur0(t)} + ${eur0(pol)} ) ÷ ${eur0(B.tot)} = <b>${(liq/B.tot).toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})} meses</b>
+      &nbsp;·&nbsp; sólo con caja: ${(t/B.tot).toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})} meses</div>
+    <h2 style="font-size:15px;margin-top:16px">Cómo se llega al denominador</h2>${paso}
+    <h2 style="font-size:15px;margin-top:16px">Desglose del pago operativo</h2>${det}
+    <h2 style="font-size:15px;margin-top:16px">Mes a mes</h2>${mes}
+    <p class="note" style="margin-top:12px">El pago bruto del periodo es ${eur0(pagoBruto)}/mes. Usarlo como denominador daría
+      ${(liq/pagoBruto).toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})} meses, una cifra pesimista:
+      contaría cuatro veces el movimiento de las pólizas y trataría como salida el dinero que sólo cambia de sociedad.</p>
+    <div style="margin-top:14px;display:flex;gap:8px"><button class="tag" style="cursor:pointer;border:1px solid var(--line);background:var(--surface);padding:5px 12px" onclick="csvCobertura()">Descargar en Excel</button></div>`);
+}
+function csvCobertura(){
+  const M=movsAmbito(), B=burnAmbito();
+  const asi={}; M.forEach(r=>{const k=r.soc+'|'+r.asi;(asi[k]=asi[k]||[]).push(r);});
+  const compA=new Set(Object.keys(asi).filter(k=>{
+    const P=asi[k].filter(r=>r.imp>0).reduce((a,r)=>a+r.imp,0), N=-asi[k].filter(r=>r.imp<0).reduce((a,r)=>a+r.imp,0);
+    return Math.min(P,N)>0.005;}));
+  const f=[];
+  MESES.forEach(m=>{const Mm=M.filter(r=>r.m===m);
+    const o=Mm.filter(r=>r.imp<0&&r.cat!=='Grupo y socios'&&r.cat!=='Financieros'&&!compA.has(r.soc+'|'+r.asi)).reduce((a,r)=>a-r.imp,0);
+    const fi=Math.max(0,-Mm.filter(r=>r.cat==='Financieros').reduce((a,r)=>a+r.imp,0));
+    const bruto=Mm.filter(r=>r.imp<0).reduce((a,r)=>a-r.imp,0);
+    const grp=Mm.filter(r=>r.imp<0&&r.cat==='Grupo y socios').reduce((a,r)=>a-r.imp,0);
+    const cmp=Mm.filter(r=>r.imp<0&&compA.has(r.soc+'|'+r.asi)&&r.cat!=='Grupo y socios').reduce((a,r)=>a-r.imp,0);
+    const tm=tes(m), pm=disp(m);
+    f.push([MES[m],nf.format(bruto),nf.format(grp),nf.format(cmp),nf.format(o),nf.format(fi),nf.format(o+fi),
+      tm==null?'':nf.format(tm),nf.format(pm),(o+fi)>0&&tm!=null?((tm+pm)/(o+fi)).toFixed(2):'']);});
+  f.push([]);
+  f.push(['MEDIA DEL PERIODO','','','',nf.format(B.ope),nf.format(B.fin),nf.format(B.tot),'','','']);
+  bajarCSV('cobertura_'+(SOCSEL==='GRUPO'?'grupo':SOCSEL.toLowerCase())+'.csv',
+    ['Mes','Pagos brutos','(-) Grupo','(-) Compensado','= Operativo','+ Servicio neto deuda','= Salida recurrente','Caja fin de mes','Pólizas disponibles','Cobertura (meses)'],f);
+}
+
+/* ── 2) cálculo de la previsión ── */
+function verPrev(){
+  if(!PV){abrirOvl('<h3>Previsión</h3><p class="sub">No hay datos de previsión.</p>');return;}
+  const socs=socsAmbito().filter(s=>PV.ini[s]!=null);
+  const B=document.getElementById('selEsc').value==='B';
+  const F=PV.filas.filter(f=>socs.includes(f.soc));
+  let ini=`<table style="margin-top:4px"><thead><tr><th>Sociedad</th><th class="n">Caja de partida</th><th class="n">Cobro cliente/mes</th><th class="n">Servicio deuda/mes</th><th class="n">Nóminas/mes</th><th class="n">IVA/mes</th></tr></thead><tbody>`;
+  socs.forEach(s=>{const r=PV.rec[s];
+    ini+=`<tr><td>${esc(SOCN[s])}</td><td class="n">${nf0.format(PV.ini[s])}</td><td class="n">${nf0.format(r.cli)}</td>
+      <td class="n">${nf0.format(r.deuda)}</td><td class="n">${nf0.format(r.nom)}</td><td class="n">${nf0.format(r.imp)}</td></tr>`;});
+  ini+=`<tr style="font-weight:650;background:var(--surface-2)"><td>TOTAL</td>
+    <td class="n">${nf0.format(socs.reduce((a,s)=>a+PV.ini[s],0))}</td>
+    <td class="n">${nf0.format(socs.reduce((a,s)=>a+PV.rec[s].cli,0))}</td>
+    <td class="n">${nf0.format(socs.reduce((a,s)=>a+PV.rec[s].deuda,0))}</td>
+    <td class="n">${nf0.format(socs.reduce((a,s)=>a+PV.rec[s].nom,0))}</td>
+    <td class="n">${nf0.format(socs.reduce((a,s)=>a+PV.rec[s].imp,0))}</td></tr></tbody></table>`;
+  const fs=i=>{const d=new Date(PV.sem[i]+'T00:00');return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0');};
+  let sem=`<table style="margin-top:4px"><thead><tr><th>Semana</th><th class="n">Cartera cobros</th><th class="n">Compl. ritmo</th><th class="n">= Entradas</th><th class="n">Cartera pagos</th><th class="n">Deuda</th><th class="n">Nóminas</th><th class="n">IVA</th><th class="n">= Salidas</th><th class="n">Neto</th><th class="n">Caja</th></tr></thead><tbody>`;
+  let acc=socs.reduce((a,s)=>a+PV.ini[s],0);
+  sem+=`<tr style="background:var(--surface-2)"><td>Caja de partida</td><td colspan="9"></td><td class="n" style="font-weight:600">${nf0.format(acc)}</td></tr>`;
+  for(let w=0;w<PV.sem.length;w++){const g=F.filter(f=>f.w===w);
+    const c1=g.reduce((a,f)=>a+f.cob,0), c2=B?g.reduce((a,f)=>a+f.cobR,0):0;
+    const p1=g.reduce((a,f)=>a+f.pag,0),p2=g.reduce((a,f)=>a+f.deu,0),p3=g.reduce((a,f)=>a+f.nom,0),p4=g.reduce((a,f)=>a+f.imp,0);
+    const e=c1+c2,s=p1+p2+p3+p4; acc+=e-s;
+    sem+=`<tr><td>S${w+1} · ${fs(w)}</td><td class="n">${c1?nf0.format(c1):'—'}</td><td class="n">${c2?nf0.format(c2):'—'}</td>
+      <td class="n up">${nf0.format(e)}</td><td class="n">${p1?nf0.format(p1):'—'}</td><td class="n">${p2?nf0.format(p2):'—'}</td>
+      <td class="n">${p3?nf0.format(p3):'—'}</td><td class="n">${p4?nf0.format(p4):'—'}</td>
+      <td class="n dn">${nf0.format(s)}</td><td class="n ${signCls(e-s)}">${nf0.format(e-s)}</td>
+      <td class="n" style="font-weight:600">${nf0.format(acc)}</td></tr>`;}
+  sem+='</tbody></table>';
+  abrirOvl(`<h3>Cómo se calcula la previsión · ${esc(nombreAmbito())}</h3>
+    <p class="sub">Escenario ${B?'de continuidad':'sólo documentado'} · 13 semanas desde el ${fs(0)}</p>
+    <div class="frm"><b>Caja de la semana = caja anterior + entradas − salidas</b><br>
+      <b>Entradas</b> = efectos de la cartera de cobros con vencimiento esa semana${B?' + complemento hasta el ritmo medio semanal de cobro de clientes (media mensual ÷ 4,345)':''}<br>
+      <b>Salidas</b> = efectos de la cartera de pagos con vencimiento esa semana + servicio de la deuda y nóminas a fin de mes + IVA el 20/10<br>
+      Los importes recurrentes son la <b>media mensual neta de enero a julio</b> de cada sociedad. Lo vencido se imputa a la primera semana.</div>
+    <h2 style="font-size:15px;margin-top:16px">Parámetros de partida</h2>${ini}
+    <h2 style="font-size:15px;margin-top:16px">Desarrollo semana a semana</h2><div class="scroll">${sem}</div>
+    <p class="note" style="margin-top:12px">No incluye ventas sin facturar, compras no comprometidas, inversiones, nuevas disposiciones de póliza ni movimientos con el grupo.</p>
+    <div style="margin-top:14px"><button class="tag" style="cursor:pointer;border:1px solid var(--line);background:var(--surface);padding:5px 12px" onclick="csvPrev()">Descargar en Excel</button></div>`);
+}
+function csvPrev(){
+  if(!PV)return;
+  const socs=socsAmbito().filter(s=>PV.ini[s]!=null);
+  const B=document.getElementById('selEsc').value==='B';
+  const F=PV.filas.filter(f=>socs.includes(f.soc));
+  const f=[];
+  f.push(['PARÁMETROS DE PARTIDA']);
+  f.push(['Sociedad','Caja de partida','Cobro cliente/mes','Servicio deuda/mes','Nóminas/mes','IVA/mes']);
+  socs.forEach(s=>{const r=PV.rec[s];f.push([SOCN[s],nf.format(PV.ini[s]),nf.format(r.cli),nf.format(r.deuda),nf.format(r.nom),nf.format(r.imp)]);});
+  f.push([]);
+  f.push(['DESARROLLO SEMANAL · escenario '+(B?'continuidad':'sólo documentado')]);
+  f.push(['Semana','Desde','Cartera cobros','Complemento ritmo','Entradas','Cartera pagos','Deuda','Nóminas','IVA','Salidas','Neto','Caja acumulada']);
+  let acc=socs.reduce((a,s)=>a+PV.ini[s],0);
+  for(let w=0;w<PV.sem.length;w++){const g=F.filter(x=>x.w===w);
+    const c1=g.reduce((a,x)=>a+x.cob,0), c2=B?g.reduce((a,x)=>a+x.cobR,0):0;
+    const p1=g.reduce((a,x)=>a+x.pag,0),p2=g.reduce((a,x)=>a+x.deu,0),p3=g.reduce((a,x)=>a+x.nom,0),p4=g.reduce((a,x)=>a+x.imp,0);
+    const e=c1+c2,s=p1+p2+p3+p4; acc+=e-s;
+    f.push(['S'+(w+1),PV.sem[w],nf.format(c1),nf.format(c2),nf.format(e),nf.format(p1),nf.format(p2),nf.format(p3),nf.format(p4),nf.format(s),nf.format(e-s),nf.format(acc)]);}
+  f.push([]);
+  f.push(['DETALLE POR SOCIEDAD Y SEMANA']);
+  f.push(['Sociedad','Semana','Desde','Cartera cobros','Complemento ritmo','Cartera pagos','Deuda','Nóminas','IVA']);
+  F.forEach(x=>{if(x.cob||x.cobR||x.pag||x.deu||x.nom||x.imp)
+    f.push([SOCN[x.soc],'S'+(x.w+1),PV.sem[x.w],nf.format(x.cob),nf.format(x.cobR),nf.format(x.pag),nf.format(x.deu),nf.format(x.nom),nf.format(x.imp)]);});
+  bajarCSV('prevision_13sem_'+(SOCSEL==='GRUPO'?'grupo':SOCSEL.toLowerCase())+'.csv',
+    ['Previsión de tesorería · '+nombreAmbito()],f);
+}
+
 /* ═══════════════════════ CALIDAD ═══════════════════════ */
 function calidad(){
   const CC=DATA.conciliacion.filter(r=>enAmbito(r.soc));
@@ -1649,6 +1825,8 @@ function render(t){
   if(t==='port')portada(); else if(t==='banc')bancos(); else if(t==='flujo')flujo();
   else if(t==='rvp')rvp(); else if(t==='estr')estructura(); else if(t==='prev')prevision(); else if(t==='movs')movimientos(); else if(t==='cal')calidad();
 }
+document.getElementById('covCard').onclick=verCobertura;
+document.querySelectorAll('[data-prev]').forEach(el=>el.onclick=verPrev);
 function repintar(){
   document.getElementById('movsBody').dataset.on='0';
   document.getElementById('prevBody').dataset.on='0';
