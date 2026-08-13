@@ -199,6 +199,108 @@ li.incli .incd p{margin:0 0 6px}
 </style>
 </head>
 <body>
+<style id="ccVelo">
+body>*{display:none!important}
+body>#ccAcc{display:flex!important}
+</style>
+<div id="ccAcc" role="dialog" aria-modal="true" aria-labelledby="ccTit">
+<style>
+#ccAcc{position:fixed;inset:0;z-index:2147483647;display:flex;align-items:center;
+  justify-content:center;background:#f4f5f1;padding:20px;
+  font:15px/1.45 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#1c2321}
+#ccAcc .caja{background:#fff;border:1px solid #dcdfd6;border-radius:12px;padding:26px 26px 20px;
+  width:100%;max-width:380px;box-shadow:0 8px 30px rgba(0,0,0,.09)}
+#ccAcc .tri{display:flex;gap:3px;margin-bottom:14px}
+#ccAcc .tri i{width:9px;height:26px;border-radius:2px;display:block}
+#ccAcc .tri i:nth-child(1){background:#4b7f36}
+#ccAcc .tri i:nth-child(2){background:#8e1b29}
+#ccAcc .tri i:nth-child(3){background:#102c57}
+#ccAcc h1{font-size:17px;font-weight:640;margin:0 0 3px;letter-spacing:-.01em}
+#ccAcc .sub{font-size:12.5px;color:#6b7280;margin:0 0 18px}
+#ccAcc label{display:block;font-size:12px;color:#6b7280;margin:0 0 4px}
+#ccAcc input{width:100%;box-sizing:border-box;padding:9px 11px;font-size:15px;
+  border:1px solid #ccd1c6;border-radius:7px;background:#fff;color:#1c2321;margin-bottom:12px}
+#ccAcc input:focus{outline:2px solid #4b7f36;outline-offset:-1px;border-color:#4b7f36}
+#ccAcc button{width:100%;padding:10px;font-size:14.5px;font-weight:600;cursor:pointer;
+  border:0;border-radius:7px;background:#102c57;color:#fff}
+#ccAcc button:hover{background:#163a72}
+#ccAcc .err{font-size:12.5px;color:#8e1b29;min-height:17px;margin:9px 0 0}
+#ccAcc .pie{font-size:11px;color:#8b9199;margin:16px 0 0;line-height:1.5;border-top:1px solid #eceee7;padding-top:11px}
+@media(prefers-color-scheme:dark){
+  #ccAcc{background:#14171a;color:#e6e8e3}
+  #ccAcc .caja{background:#1b1f23;border-color:#2b3138;box-shadow:none}
+  #ccAcc input{background:#14171a;border-color:#39404a;color:#e6e8e3}
+  #ccAcc .pie{border-top-color:#2b3138}
+}
+</style>
+  <form class="caja" id="ccForm" autocomplete="off">
+    <div class="tri"><i></i><i></i><i></i></div>
+    <h1 id="ccTit">Control de Caja · Grupo Alhándiga Grancampo</h1>
+    <p class="sub">Uso interno. Introduce tus credenciales para continuar.</p>
+    <label for="ccUsr">Usuario</label>
+    <input id="ccUsr" name="ccUsr" type="text" autocomplete="off" autocapitalize="off"
+           autocorrect="off" spellcheck="false" required>
+    <label for="ccPwd">Contraseña</label>
+    <input id="ccPwd" name="ccPwd" type="password" autocomplete="current-password" required>
+    <button type="submit">Entrar</button>
+    <p class="err" id="ccErr" role="alert"></p>
+    <p class="pie">Esta pantalla evita entrar por casualidad. No cifra los datos
+       ni sustituye a un control de acceso en el servidor.</p>
+  </form>
+</div>
+<script>
+(function(){
+'use strict';
+var CFG={u:"caja",s:"5ea11301dea5fd28a1d56d154eab5454",h:"e2ce855b0654e33f0164e284677438b7c5b305ac1b759bedf01e3b8a5bf4547f"};
+var velo=document.getElementById('ccVelo'),
+    caja=document.getElementById('ccAcc'),
+    form=document.getElementById('ccForm'),
+    usr =document.getElementById('ccUsr'),
+    pwd =document.getElementById('ccPwd'),
+    err =document.getElementById('ccErr');
+
+function abrir(){
+  if(velo&&velo.parentNode)velo.parentNode.removeChild(velo);
+  if(caja&&caja.parentNode)caja.parentNode.removeChild(caja);
+  /* Los graficos se han medido a cero mientras estaban ocultos. */
+  try{window.dispatchEvent(new Event('resize'));}catch(e){}
+}
+
+/* 'cc_acceso' es la unica clave de almacenamiento del documento publicado, y va
+   a proposito en sessionStorage y no en localStorage: la sesion se olvida al
+   cerrar el navegador, que es lo que hay que hacer en un ordenador compartido.
+   Se escribe literal en las dos llamadas para que la guarda del build la vea. */
+function guardado(){try{return sessionStorage.getItem('cc_acceso');}catch(e){return null;}}
+function guardar(v){try{sessionStorage.setItem('cc_acceso',v);}catch(e){}}
+
+async function hash(u,p){
+  var txt=CFG.s+"\n"+u+"\n"+p;
+  var buf=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(txt));
+  return Array.prototype.map.call(new Uint8Array(buf),function(b){
+    return b.toString(16).padStart(2,'0');}).join('');
+}
+
+if(guardado()===CFG.h){abrir();return;}
+
+if(!(window.crypto&&crypto.subtle)){
+  err.textContent='Esta pantalla necesita una conexión segura (https). Ábrelo desde la dirección publicada.';
+  form.querySelector('button').disabled=true;
+  return;
+}
+
+usr.focus();
+form.addEventListener('submit',function(ev){
+  ev.preventDefault();
+  err.textContent='';
+  var u=usr.value.trim(),p=pwd.value;
+  hash(u,p).then(function(h){
+    if(u===CFG.u&&h===CFG.h){guardar(h);abrir();}
+    else{err.textContent='Usuario o contraseña incorrectos.';pwd.value='';pwd.focus();}
+  }).catch(function(){err.textContent='No se ha podido comprobar la contraseña en este navegador.';});
+});
+})();
+</script>
+
 <div class="brandbar">
   <div class="brandin">
     <div class="gname">
