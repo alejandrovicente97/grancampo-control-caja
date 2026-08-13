@@ -309,7 +309,14 @@ form.addEventListener('submit',function(ev){
   err.textContent='';
   var u=usr.value.trim(),p=pwd.value;
   hash(u,p).then(function(h){
-    if(u===CFG.u&&h===CFG.h){guardar(h);abrir();}
+    if(u===CFG.u&&h===CFG.h){
+      guardar(h);
+      /* Recargar es mas fiable que destapar en caliente: al volver, la sesion ya
+         esta guardada, el velo se quita nada mas empezar a leer el documento y
+         los graficos se construyen midiendo un ancho de verdad, no cero. Si la
+         recarga no fuese posible, se destapa a mano y se remide. */
+      try{location.reload();}catch(e){abrir();}
+    }
     else{err.textContent='Usuario o contraseña incorrectos.';pwd.value='';pwd.focus();}
   }).catch(function(){err.textContent='No se ha podido comprobar la contraseña en este navegador.';});
 });
