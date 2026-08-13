@@ -681,6 +681,26 @@ const saldoFinMes=m=>{const s=serieDiaria().filter(d=>d.f.slice(0,7)<=`2026-${St
   return s.length?ult(s).tot:null;};
 const aperturaAmbito=()=>DATA.aperturas.filter(a=>enAmbito(a.soc)).reduce((x,a)=>x+a.v,0);
 
+
+/* salida recurrente mensual del ámbito: la base honesta para medir cobertura.
+   Excluye (1) movimientos con el grupo, (2) la parte compensada de los asientos que
+   netean cobro y pago sin pasar por el banco, y (3) computa Financieros por su flujo
+   NETO, porque el bruto incluye devoluciones de póliza que se compensan con sus
+   disposiciones y multiplicarían por cuatro el servicio real de la deuda. */
+function burnAmbito(){
+  const M=movsAmbito(); if(!M.length) return null;
+  const nm=new Set(M.map(r=>r.m)).size||1;
+  const asi={}; M.forEach(r=>{const k=r.soc+'|'+r.asi;(asi[k]=asi[k]||[]).push(r);});
+  const compAsi=new Set(Object.keys(asi).filter(k=>{
+    const P=asi[k].filter(r=>r.imp>0).reduce((a,r)=>a+r.imp,0), N=-asi[k].filter(r=>r.imp<0).reduce((a,r)=>a+r.imp,0);
+    return Math.min(P,N)>0.005;}));
+  const ope=M.filter(r=>r.imp<0&&r.cat!=='Grupo y socios'&&r.cat!=='Financieros'&&!compAsi.has(r.soc+'|'+r.asi))
+             .reduce((a,r)=>a-r.imp,0);
+  const finN=Math.max(0,-M.filter(r=>r.cat==='Financieros').reduce((a,r)=>a+r.imp,0));
+  const bruto=M.filter(r=>r.imp<0).reduce((a,r)=>a-r.imp,0);
+  return {ope:ope/nm, fin:finN/nm, tot:(ope+finN)/nm, bruto:bruto/nm, nm};
+}
+
 /* cobertura del libro diario dentro del ámbito */
 function cobertura(){
   const socs=socsAmbito();
@@ -743,14 +763,18 @@ function portada(){
   document.getElementById('kDisp').textContent=kEur(liq);
   document.getElementById('kDispd').textContent=`caja ${kEur(t||0)} + ${kEur(pol)} sin disponer`;
 
-  // meses de cobertura: liquidez / pago medio mensual del periodo con diario
-  const mesesDia=[...new Set(movsAmbito().map(r=>r.m))];
-  const burn=mesesDia.length?Math.abs(movsAmbito().filter(r=>r.imp<0).reduce((a,r)=>a+r.imp,0))/mesesDia.length:0;
+  // meses de cobertura sobre la salida recurrente, no sobre el pago bruto
+  const B=burnAmbito(), burn=B?B.tot:0;
   const cv1=burn>0?(t||0)/burn:null, cv2=burn>0?liq/burn:null;
   const kc=document.getElementById('kCov');
   kc.innerHTML=cv2==null?'s/d':`<span class="${cv2<1?'dn':(cv2<2?'':'up')}">${cv2.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})}</span>`;
-  document.getElementById('kCovd').textContent=cv2==null?'sin libro diario'
-    :`con caja sola ${cv1.toLocaleString('es-ES',{maximumFractionDigits:2})} · pago medio ${kEur(burn)}/mes`;
+  const kcd=document.getElementById('kCovd');
+  kcd.textContent=cv2==null?'sin libro diario'
+    :`con caja sola ${cv1.toLocaleString('es-ES',{maximumFractionDigits:2})} · salida recurrente ${kEur(burn)}/mes`;
+  if(B)kcd.title=`Salida recurrente = ${kEur(B.ope)} de pagos operativos + ${kEur(B.fin)} de servicio neto de la deuda.
+`
+    +`No se cuentan los movimientos con el grupo, la parte compensada de los asientos que netean cobro y pago, `
+    +`ni el bruto de las pólizas (disposiciones y devoluciones se anulan entre sí). El pago bruto del periodo es ${kEur(B.bruto)}/mes.`;
 
   waterfall(m);
 
@@ -1426,13 +1450,13 @@ function alertas(P){
   const add=(sev,t,d)=>A.push({sev,t,d});
   // 1) cobertura de liquidez
   const t=tes(ULT)||0, liq=t+P.pol;
-  const mesesDia=[...new Set(movsAmbito().map(r=>r.m))];
-  const burn=mesesDia.length?Math.abs(movsAmbito().filter(r=>r.imp<0).reduce((a,r)=>a+r.imp,0))/mesesDia.length:0;
+  const BB=burnAmbito(), burn=BB?BB.tot:0;
   if(burn>0){const cv=liq/burn;
-    if(cv<1)add('alta',`Cobertura de liquidez por debajo de un mes: ${cv.toFixed(2)} meses`,
-      `Caja y pólizas suman ${eur0(liq)} frente a un pago medio de ${eur0(burn)} al mes.`);
+    const det=`Caja y pólizas suman ${eur0(liq)} frente a una salida recurrente de ${eur0(burn)} al mes `
+      +`(${eur0(BB.ope)} operativos + ${eur0(BB.fin)} de servicio neto de la deuda).`;
+    if(cv<1)add('alta',`Cobertura de liquidez por debajo de un mes: ${cv.toFixed(2)} meses`,det);
     else if(cv<2)add('media',`Cobertura de liquidez ajustada: ${cv.toFixed(2)} meses`,
-      `Caja y pólizas suman ${eur0(liq)} frente a un pago medio de ${eur0(burn)} al mes. Por debajo de dos meses conviene vigilancia semanal.`);}
+      det+' Por debajo de dos meses conviene vigilancia semanal.');}
   // 2) previsión en negativo
   if(P.neg>0)add('alta',`La proyección entra en negativo en ${P.neg} de las 13 semanas`,
     `El punto más bajo es ${eur0(P.mn)} en la semana ${P.iMin+1}. Con las pólizas disponibles el colchón sería ${eur0(P.mn+P.pol)}.`);
