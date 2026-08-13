@@ -259,11 +259,26 @@ var velo=document.getElementById('ccVelo'),
     pwd =document.getElementById('ccPwd'),
     err =document.getElementById('ccErr');
 
+/* Los graficos se han creado y medido a cero mientras estaban ocultos. No basta
+   con un solo aviso: el evento se lanza antes de que el navegador haya hecho el
+   calculo de tamanos, asi que se repite tras el primer pintado y ademas se
+   redimensiona cada grafico por su nombre, que es lo unico que no depende de
+   como escuche Chart.js los cambios de tamano. */
+function remedir(){
+  try{window.dispatchEvent(new Event('resize'));}catch(e){}
+  if(!window.Chart||!Chart.getChart)return;
+  var lienzos=document.querySelectorAll('canvas');
+  for(var i=0;i<lienzos.length;i++){
+    try{var g=Chart.getChart(lienzos[i]);if(g)g.resize();}catch(e){}
+  }
+}
+
 function abrir(){
   if(velo&&velo.parentNode)velo.parentNode.removeChild(velo);
   if(caja&&caja.parentNode)caja.parentNode.removeChild(caja);
-  /* Los graficos se han medido a cero mientras estaban ocultos. */
-  try{window.dispatchEvent(new Event('resize'));}catch(e){}
+  remedir();
+  if(window.requestAnimationFrame)requestAnimationFrame(remedir);
+  setTimeout(remedir,120); setTimeout(remedir,500);
 }
 
 /* 'cc_acceso' es la unica clave de almacenamiento del documento publicado, y va
